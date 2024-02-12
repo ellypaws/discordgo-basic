@@ -1,6 +1,7 @@
 package main
 
 import (
+	"discordgo-basic/discord_bot"
 	"flag"
 	"github.com/joho/godotenv"
 	"log"
@@ -49,6 +50,27 @@ func init() {
 
 func main() {
 	flag.Parse()
+
+	if botToken == nil || *botToken == "" {
+		log.Fatalf("Bot token flag is required")
+	}
+
+	var removeCommands bool
+
+	if removeCommandsFlag != nil && *removeCommandsFlag {
+		removeCommands = *removeCommandsFlag
+	}
+
+	bot, err := discord_bot.New(&discord_bot.Config{
+		BotToken:       *botToken,
+		GuildID:        *guildID,
+		RemoveCommands: removeCommands,
+	})
+	if err != nil {
+		log.Fatalf("Error creating Discord bot: %v", err)
+	}
+
+	bot.Start()
 
 	log.Println("Gracefully shutting down.")
 }
